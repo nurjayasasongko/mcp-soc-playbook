@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mcp-soc-playbook — Nurjaya Sasongko</title>
+  <meta name="description" content="Referensi praktis untuk menghubungkan tools SOC ke LLM via MCP — security-first perspective." />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0e1a; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0e1a; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const REPO = "https://github.com/nurjayasasongko/mcp-soc-playbook/blob/main";
+    const MEDIUM = "https://medium.com/@nurjayasasongko";
+
+    const hosts = [
+      { name: "Claude Desktop", icon: "🖥️", badge: "Paling mudah", file: `${REPO}/hosts/claude-desktop.md`, note: "Tidak perlu CLI, ada GUI" },
+      { name: "Claude Code", icon: "⌨️", badge: "Best security", file: `${REPO}/hosts/claude-code.md`, note: "Scope isolation dengan -s local" },
+      { name: "VS Code", icon: "💻", badge: "Familiar", file: `${REPO}/hosts/vscode.md`, note: "Lewat ekstensi Copilot/Continue" },
+      { name: "Cursor", icon: "🎯", badge: "GUI terbaik", file: `${REPO}/hosts/cursor.md`, note: "Settings UI built-in untuk MCP" },
+      { name: "Windsurf", icon: "🌊", badge: "Dari Codeium", file: `${REPO}/hosts/windsurf.md`, note: "Mirip Cursor, global config" },
+    ];
+
+    const usecases = [
+      { id: "01", title: "IOC Enrichment", level: "beginner", tools: ["VirusTotal", "AbuseIPDB", "MalwareBazaar"], req: "API key gratis saja", link: `${REPO}/usecases/01-ioc-enrichment/README.md`, desc: "Alert masuk → enrichment IOC otomatis → summary actionable" },
+      { id: "02", title: "Malware Triage", level: "beginner", tools: ["REMnux", "VirusTotal"], req: "Docker", link: `${REPO}/usecases/02-malware-triage/README.md`, desc: "File mencurigakan → identify → strings → IOC → verdict" },
+      { id: "03", title: "Threat Hunting via SIEM", level: "intermediate", tools: ["Wazuh", "VirusTotal"], req: "Wazuh instance", link: `${REPO}/usecases/03-threat-hunting-siem/README.md`, desc: "Hipotesis → query SIEM → analisis pola → hunting report" },
+      { id: "04", title: "Incident Case Creation", level: "intermediate", tools: ["TheHive", "VirusTotal", "AbuseIPDB"], req: "TheHive instance", link: `${REPO}/usecases/04-incident-case-creation/README.md`, desc: "Alert tervalidasi → enrichment → buat case → assign observables" },
+      { id: "05", title: "OSINT Recon", level: "intermediate", tools: ["Shodan", "VirusTotal", "AbuseIPDB"], req: "Shodan API key", link: `${REPO}/usecases/05-osint-recon/README.md`, desc: "Domain/IP target → passive recon → infrastructure map" },
+      { id: "06", title: "Detection Engineering", level: "advanced", tools: ["VirusTotal", "Wazuh"], req: "Wazuh + VT API", link: `${REPO}/usecases/06-detection-engineering/README.md`, desc: "IOC/TTP baru → research → draft rule → validate → document" },
+      { id: "07", title: "Lateral Movement Detection", level: "advanced", tools: ["Wazuh", "AbuseIPDB"], req: "Wazuh + Windows agents", link: `${REPO}/usecases/07-lateral-movement-detection/README.md`, desc: "Anomali login → correlate events → timeline → assessment" },
+      { id: "08", title: "Phishing Analysis", level: "intermediate", tools: ["VirusTotal", "AbuseIPDB", "REMnux"], req: "Docker + API keys", link: `${REPO}/usecases/08-phishing-analysis/README.md`, desc: "Email mencurigakan → artifact extract → analisis → verdict" },
+    ];
+
+    const securityNotes = [
+      { title: "Attack Surface per Host", file: `${REPO}/security-notes/attack-surface-per-client.md`, desc: "Risiko spesifik per aplikasi host" },
+      { title: "Official vs Community Server", file: `${REPO}/security-notes/official-vs-community.md`, desc: "Cara evaluasi server sebelum dipakai" },
+      { title: "Secrets Management", file: `${REPO}/security-notes/secrets-management.md`, desc: "Handle API key dengan benar" },
+      { title: "Least Privilege Guide", file: `${REPO}/security-notes/least-privilege-guide.md`, desc: "Prinsip akses minimal per server" },
+      { title: "MCP Threat Landscape", file: `${REPO}/security-notes/mcp-threat-landscape.md`, desc: "Attack vectors dari riset terbaru" },
+    ];
+
+    const articles = [
+      { num: "01", title: "Mengenal MCP: Fondasi Baru Integrasi LLM dan Tools", status: "live", link: MEDIUM },
+      { num: "02", title: "Membedah Arsitektur MCP: Komponen dan Layer Protokol", status: "live", link: MEDIUM },
+      { num: "03", title: "MCP in Practice: Setup & Integrasi per Client", status: "soon" },
+      { num: "04", title: "MCP dan Risiko: Apa Kata Riset?", status: "soon" },
+      { num: "05", title: "Lab: Simulasi dan Deteksi Tool Poisoning", status: "soon" },
+      { num: "06", title: "Secure MCP Server Design", status: "soon" },
+      { num: "07", title: "Official vs Community MCP Server", status: "soon" },
+    ];
+
+    const levelConfig = {
+      beginner:     { label: "Mulai dari sini", color: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.25)" },
+      intermediate: { label: "Menengah",         color: "#f59e0b", bg: "rgba(245,158,11,0.1)", border: "rgba(245,158,11,0.25)" },
+      advanced:     { label: "Advanced",          color: "#ef4444", bg: "rgba(239,68,68,0.1)",  border: "rgba(239,68,68,0.25)" },
+    };
+
+    function Tag({ children }) {
+      return (
+        <span style={{ fontSize: 10, padding: "2px 8px", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", color: "#818cf8", borderRadius: 4, fontWeight: 500 }}>
+          {children}
+        </span>
+      );
+    }
+
+    function SectionTitle({ children }) {
+      return <h2 style={{ fontSize: 16, fontWeight: 700, color: "#e2e8f0", margin: "0 0 16px", letterSpacing: -0.3 }}>{children}</h2>;
+    }
+
+    function StepBlock({ number, title, children }) {
+      return (
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+            <div style={{ width: 26, height: 26, background: "#6366f1", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+              {number}
+            </div>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0" }}>{title}</span>
+          </div>
+          <div style={{ paddingLeft: 38 }}>{children}</div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [activeTab, setActiveTab]       = useState("start");
+      const [filterLevel, setFilterLevel]   = useState("all");
+      const [hoveredHost, setHoveredHost]   = useState(null);
+      const [hoveredUC, setHoveredUC]       = useState(null);
+      const [hoveredSec, setHoveredSec]     = useState(null);
+
+      const filtered = filterLevel === "all" ? usecases : usecases.filter(u => u.level === filterLevel);
+
+      const tabs = [
+        { id: "start",    label: "🚀 Mulai" },
+        { id: "usecases", label: "🎯 Use Cases" },
+        { id: "security", label: "🔐 Security" },
+        { id: "articles", label: "📖 Artikel" },
+      ];
+
+      return (
+        <div style={{ minHeight: "100vh", background: "#0a0e1a", color: "#e2e8f0", fontFamily: "'JetBrains Mono','Fira Code','Courier New',monospace" }}>
+
+          {/* HEADER */}
+          <div style={{ background: "linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%)", borderBottom: "1px solid rgba(99,102,241,0.3)", padding: "40px 32px 32px", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(99,102,241,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,0.05) 1px,transparent 1px)", backgroundSize: "40px 40px", pointerEvents: "none" }} />
+            <div style={{ position: "relative", maxWidth: 860, margin: "0 auto" }}>
+              <div style={{ fontSize: 11, color: "#6366f1", letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}>
+                github.com/nurjayasasongko/mcp-soc-playbook
+              </div>
+              <h1 style={{ fontSize: "clamp(22px,4vw,38px)", fontWeight: 700, margin: "0 0 8px", background: "linear-gradient(135deg,#e2e8f0 0%,#818cf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: -1 }}>
+                🛡️ mcp-soc-playbook
+              </h1>
+              <p style={{ color: "#94a3b8", fontSize: 13, margin: "0 0 24px", lineHeight: 1.6 }}>
+                Referensi praktis untuk menghubungkan tools SOC ke LLM via MCP — security-first.<br />
+                Companion repo seri artikel MCP Security · <span style={{ color: "#818cf8" }}>@nurjayasasongko</span>
+              </p>
+              <div style={{ display: "flex", gap: 28, flexWrap: "wrap" }}>
+                {[["8","Use Cases"],["5","Hosts"],["30+","SOC Tools"],["5","Security Notes"]].map(([v,l]) => (
+                  <div key={l}>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: "#818cf8" }}>{v}</div>
+                    <div style={{ fontSize: 10, color: "#64748b", textTransform: "uppercase", letterSpacing: 1 }}>{l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* TABS */}
+          <div style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#0d1117", padding: "0 32px", position: "sticky", top: 0, zIndex: 10 }}>
+            <div style={{ maxWidth: 860, margin: "0 auto", display: "flex" }}>
+              {tabs.map(t => (
+                <button key={t.id} onClick={() => setActiveTab(t.id)} style={{ background: "none", border: "none", padding: "15px 18px", fontSize: 13, color: activeTab === t.id ? "#818cf8" : "#64748b", cursor: "pointer", borderBottom: activeTab === t.id ? "2px solid #6366f1" : "2px solid transparent", transition: "all 0.15s", fontFamily: "inherit", letterSpacing: 0.3 }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* CONTENT */}
+          <div style={{ maxWidth: 860, margin: "0 auto", padding: "32px 32px 60px" }}>
+
+            {/* ── START ── */}
+            {activeTab === "start" && (
+              <div>
+                <SectionTitle>Baru pertama kali? Mulai dari sini.</SectionTitle>
+                <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.7, margin: "0 0 28px" }}>
+                  Pilih host yang sudah kamu punya, setup MCP-nya, lalu coba use case paling simpel. Tidak perlu baca semua dulu.
+                </p>
+
+                <StepBlock number="1" title="Pilih host yang sudah kamu punya">
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 10 }}>
+                    {hosts.map((h, i) => (
+                      <a key={i} href={h.file} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                        <div onMouseEnter={() => setHoveredHost(i)} onMouseLeave={() => setHoveredHost(null)}
+                          style={{ padding: "14px 16px", background: hoveredHost === i ? "rgba(99,102,241,0.1)" : "rgba(255,255,255,0.03)", border: hoveredHost === i ? "1px solid rgba(99,102,241,0.4)" : "1px solid rgba(255,255,255,0.06)", borderRadius: 8, cursor: "pointer", transition: "all 0.15s" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5 }}>
+                            <span style={{ fontSize: 18 }}>{h.icon}</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>{h.name}</span>
+                          </div>
+                          <div style={{ fontSize: 10, color: "#6366f1", marginBottom: 3 }}>{h.badge}</div>
+                          <div style={{ fontSize: 11, color: "#64748b" }}>{h.note}</div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </StepBlock>
+
+                <StepBlock number="2" title="Coba use case paling simpel dulu">
+                  <div style={{ padding: 20, background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16, marginBottom: 14 }}>
+                    <div>
+                      <div style={{ fontSize: 11, color: "#22c55e", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>🟢 Recommended start</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0", marginBottom: 4 }}>Use Case 01 — IOC Enrichment</div>
+                      <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 10 }}>Alert masuk → enrichment IOC otomatis → summary actionable</div>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        {["VirusTotal","AbuseIPDB","MalwareBazaar"].map(t => <Tag key={t}>{t}</Tag>)}
+                      </div>
+                    </div>
+                    <div style={{ flexShrink: 0 }}>
+                      <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8 }}>Requirements:</div>
+                      {["API key gratis saja","Tidak perlu Docker","Tidak perlu server"].map(r => (
+                        <div key={r} style={{ fontSize: 12, color: "#22c55e", marginBottom: 2 }}>✓ {r}</div>
+                      ))}
+                    </div>
+                  </div>
+                  <a href={`${REPO}/usecases/01-ioc-enrichment/README.md`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-block", padding: "10px 20px", background: "#6366f1", color: "#fff", textDecoration: "none", borderRadius: 6, fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
+                    → Buka Use Case 01
+                  </a>
+                </StepBlock>
+
+                <StepBlock number="3" title="Kalau sudah jalan, explore lebih jauh">
+                  <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 14, lineHeight: 1.6 }}>
+                    Pindah ke tab <span style={{ color: "#818cf8" }}>Use Cases</span> untuk 8 workflow SOC, atau <span style={{ color: "#818cf8" }}>Security</span> untuk memahami risikonya sebelum ke environment nyata.
+                  </p>
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                    <button onClick={() => setActiveTab("usecases")} style={{ padding: "8px 16px", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", color: "#818cf8", borderRadius: 6, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+                      🎯 Lihat Use Cases →
+                    </button>
+                    <button onClick={() => setActiveTab("security")} style={{ padding: "8px 16px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", borderRadius: 6, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+                      🔐 Baca Security Notes →
+                    </button>
+                  </div>
+                </StepBlock>
+              </div>
+            )}
+
+            {/* ── USE CASES ── */}
+            {activeTab === "usecases" && (
+              <div>
+                <SectionTitle>Use Cases — SOC Workflows via MCP</SectionTitle>
+                <p style={{ color: "#94a3b8", fontSize: 13, margin: "0 0 20px", lineHeight: 1.7 }}>
+                  Setiap use case include: skenario nyata, config siap pakai, contoh prompt, dan security notes.
+                </p>
+                <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+                  {[["all","Semua"],["beginner","🟢 Pemula"],["intermediate","🟡 Menengah"],["advanced","🔴 Advanced"]].map(([f,l]) => (
+                    <button key={f} onClick={() => setFilterLevel(f)} style={{ padding: "6px 14px", background: filterLevel === f ? "rgba(99,102,241,0.2)" : "rgba(255,255,255,0.03)", border: filterLevel === f ? "1px solid rgba(99,102,241,0.5)" : "1px solid rgba(255,255,255,0.08)", color: filterLevel === f ? "#818cf8" : "#64748b", borderRadius: 20, fontSize: 11, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s" }}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {filtered.map((uc, i) => {
+                    const lc = levelConfig[uc.level];
+                    return (
+                      <a key={i} href={uc.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                        <div onMouseEnter={() => setHoveredUC(i)} onMouseLeave={() => setHoveredUC(null)}
+                          style={{ padding: "14px 18px", background: hoveredUC === i ? "rgba(99,102,241,0.06)" : "rgba(255,255,255,0.02)", border: hoveredUC === i ? "1px solid rgba(99,102,241,0.3)" : "1px solid rgba(255,255,255,0.06)", borderRadius: 8, cursor: "pointer", transition: "all 0.15s", display: "flex", alignItems: "flex-start", gap: 14 }}>
+                          <span style={{ fontSize: 11, color: "#4b5563", fontWeight: 700, minWidth: 20, paddingTop: 2 }}>{uc.id}</span>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+                              <span style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>{uc.title}</span>
+                              <span style={{ fontSize: 10, padding: "2px 8px", background: lc.bg, border: `1px solid ${lc.border}`, color: lc.color, borderRadius: 20, fontWeight: 600 }}>{lc.label}</span>
+                            </div>
+                            <div style={{ fontSize: 12, color: "#64748b", marginBottom: 8 }}>{uc.desc}</div>
+                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                              {uc.tools.map(t => <Tag key={t}>{t}</Tag>)}
+                              <span style={{ fontSize: 11, color: "#475569" }}>· {uc.req}</span>
+                            </div>
+                          </div>
+                          <span style={{ color: "#4b5563", fontSize: 14, paddingTop: 2, flexShrink: 0 }}>→</span>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* ── SECURITY ── */}
+            {activeTab === "security" && (
+              <div>
+                <SectionTitle>Security Notes</SectionTitle>
+                <div style={{ padding: 14, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, fontSize: 13, color: "#fca5a5", marginBottom: 20, lineHeight: 1.6 }}>
+                  ⚠️ Menghubungkan AI ke tools SOC membuka attack surface baru. Baca ini sebelum deploy ke environment nyata.
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
+                  {securityNotes.map((n, i) => (
+                    <a key={i} href={n.file} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                      <div onMouseEnter={() => setHoveredSec(i)} onMouseLeave={() => setHoveredSec(null)}
+                        style={{ padding: "13px 16px", background: hoveredSec === i ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.02)", border: hoveredSec === i ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(255,255,255,0.06)", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, cursor: "pointer", transition: "all 0.15s" }}>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0", marginBottom: 2 }}>{n.title}</div>
+                          <div style={{ fontSize: 12, color: "#64748b" }}>{n.desc}</div>
+                        </div>
+                        <span style={{ color: "#4b5563", flexShrink: 0 }}>→</span>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+                <div style={{ padding: 18, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", marginBottom: 12 }}>✅ Checklist sebelum pakai MCP server baru</div>
+                  {["Siapa maintainer-nya? Vendor resmi atau individual?","Ada version tag untuk pinning? (wajib untuk community server)","Credential handling via env var? Bukan hardcoded?","Scope akses sudah dipahami? Filesystem? Network? Database?","Ada additionalProperties: False di schema?","Sudah run mcp-scan sebelum aktifkan?"].map((item, i, arr) => (
+                    <div key={i} style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", fontSize: 12, color: "#94a3b8", alignItems: "flex-start" }}>
+                      <span style={{ color: "#475569", flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── ARTICLES ── */}
+            {activeTab === "articles" && (
+              <div>
+                <SectionTitle>Seri Artikel MCP Security</SectionTitle>
+                <p style={{ color: "#94a3b8", fontSize: 13, margin: "0 0 20px", lineHeight: 1.7 }}>
+                  Repo ini companion dari seri artikel yang ditulis khusus untuk praktisi security Indonesia.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+                  {articles.map((a, i) => (
+                    <div key={i} style={{ padding: "13px 16px", background: "rgba(255,255,255,0.02)", border: a.status === "live" ? "1px solid rgba(99,102,241,0.2)" : "1px solid rgba(255,255,255,0.05)", borderRadius: 8, display: "flex", gap: 12, alignItems: "center" }}>
+                      <span style={{ fontSize: 11, color: "#4b5563", fontWeight: 700, minWidth: 20 }}>{a.num}</span>
+                      <span style={{ flex: 1, fontSize: 13, color: a.status === "live" ? "#e2e8f0" : "#64748b" }}>{a.title}</span>
+                      {a.status === "live" ? (
+                        <a href={a.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, padding: "2px 8px", background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#818cf8", borderRadius: 20, textDecoration: "none", fontWeight: 600, flexShrink: 0 }}>LIVE →</a>
+                      ) : (
+                        <span style={{ fontSize: 10, padding: "2px 8px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#4b5563", borderRadius: 20, fontWeight: 600, flexShrink: 0 }}>SOON</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div style={{ padding: 16, background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: 8, fontSize: 12, color: "#94a3b8", lineHeight: 1.7 }}>
+                  Semua artikel ditulis dari sudut pandang SOC analyst, bukan vendor atau akademis.
+                  Beberapa script di artikel lab dibuat dengan bantuan AI (vibe coding) —
+                  karena saya SOC analyst, bukan developer. Dan itu justru relevan:
+                  kalau saya bisa replikasi lab-nya, kamu juga bisa.<br /><br />
+                  <span style={{ color: "#818cf8" }}>@nurjayasasongko</span> — L2 SOC Analyst | AI Security
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>

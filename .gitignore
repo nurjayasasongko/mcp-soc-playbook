@@ -1,0 +1,18 @@
+.env
+*.env
+.env.*
+!.env.example
+
+# API keys / secrets
+secrets/
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# IDE
+.vscode/settings.json
+.idea/
