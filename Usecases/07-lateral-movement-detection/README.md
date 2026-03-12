@@ -79,4 +79,4 @@ Investigasi:
 - **Time range:** Batasi query ke window yang relevan — query tanpa batas waktu di SIEM besar bisa berdampak ke performa
 - **Korelasi lintas host:** Untuk detection lateral movement yang akurat, pastikan Wazuh agent sudah di-deploy di semua endpoint yang relevan — coverage gap akan membuat timeline tidak lengkap
 
-> Security notes lengkap → [../../security-notes/mcp-threat-landscape.md](../../security-notes/mcp-threat-landscape.md)
+> Security notes lengkap → [../../Security Notes/mcp-threat-landscape.md](../../Security%20Notes/mcp-threat-landscape.md)

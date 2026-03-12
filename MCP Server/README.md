@@ -142,4 +142,4 @@ Complete reference of MCP servers relevant to SOC workflows.
 | HexStrike AI | 🟡 Community | 150+ tools, 12 autonomous agents, offensive-focused |
 
 > ⚠️ Bundled collections = larger attack surface. Review each server individually before use.
-> See: [official-vs-community.md](../security-notes/official-vs-community.md)
+> See: [official-vs-community.md](../Security%20Notes/official-vs-community.md)

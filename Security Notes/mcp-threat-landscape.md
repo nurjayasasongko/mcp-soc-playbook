@@ -2,4 +2,4 @@
 
 Coming soon.
 
-Part of the [security-notes](.) section — covering MCP-specific security considerations for SOC environments.
+Part of the [Security Notes](.) section — covering MCP-specific security considerations for SOC environments.

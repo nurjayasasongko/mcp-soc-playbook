@@ -128,5 +128,5 @@ Prefer referencing environment variables from the system rather than embedding r
 "env": { "VT_API_KEY": "${VT_API_KEY}" }
 ```
 
-> Full security analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)
-> Secrets management guide → [../security-notes/secrets-management.md](../security-notes/secrets-management.md)
+> Full security analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)
+> Secrets management guide → [../Security Notes/secrets-management.md](../Security%20Notes/secrets-management.md)

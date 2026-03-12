@@ -14,7 +14,7 @@ Untuk use case 01, 02, 04, 08 (IOC enrichment, malware triage, case creation, ph
 ```bash
 # Clone repo
 git clone https://github.com/nurjayasasongko/mcp-soc-playbook
-cd mcp-soc-playbook/lab-setup
+cd mcp-soc-playbook/Labs
 
 # Setup env vars
 cp .env.example .env

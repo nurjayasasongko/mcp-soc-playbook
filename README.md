@@ -18,11 +18,11 @@ Most MCP repos out there focus on "how to install." This one focuses on:
 ```
 mcp-soc-playbook/
 │
-├── hosts/          → MCP client config reference (Claude, Cursor, VS Code, etc.)
-├── servers/          → MCP server reference per SOC tool category
-├── usecases/         → End-to-end SOC workflow examples
-├── security-notes/   → Attack surface analysis, hardening guides
-└── lab-setup/        → Docker Compose & WSL setup for local lab
+├── MCP Host/         → MCP client config reference (Claude, Cursor, VS Code, etc.)
+├── MCP Server/       → MCP server reference per SOC tool category
+├── Usecases/         → End-to-end SOC workflow examples
+├── Security Notes/   → Attack surface analysis, hardening guides
+└── Labs/             → Docker Compose & WSL setup for local lab
 ```
 
 ---
@@ -31,11 +31,11 @@ mcp-soc-playbook/
 
 | Client | Config Reference |
 |--------|-----------------|
-| Claude Desktop | [hosts/claude-desktop.md](hosts/claude-desktop.md) |
-| Claude Code (CLI) | [hosts/claude-code.md](hosts/claude-code.md) |
-| VS Code | [hosts/vscode.md](hosts/vscode.md) |
-| Cursor | [hosts/cursor.md](hosts/cursor.md) |
-| Windsurf | [hosts/windsurf.md](hosts/windsurf.md) |
+| Claude Desktop | [MCP Host/claude-desktop.md](MCP%20Host/claude-desktop.md) |
+| Claude Code (CLI) | [MCP Host/claude-code.md](MCP%20Host/claude-code.md) |
+| VS Code | [MCP Host/vscode.md](MCP%20Host/vscode.md) |
+| Cursor | [MCP Host/cursor.md](MCP%20Host/cursor.md) |
+| Windsurf | [MCP Host/windsurf.md](MCP%20Host/windsurf.md) |
 
 ---
 
@@ -65,7 +65,7 @@ mcp-soc-playbook/
 | Malware Analysis | Radare2, Ghidra, YARA, CAPA, Binwalk, Gitleaks |
 | Bundled Collections | FuzzingLabs mcp-security-hub, HexStrike AI |
 
-> ⚠️ **Important:** Community servers are not audited by vendors. Review source code before use in production. See [security-notes/official-vs-community.md](security-notes/official-vs-community.md)
+> ⚠️ **Important:** Community servers are not audited by vendors. Review source code before use in production. See [Security Notes/official-vs-community.md](Security%20Notes/official-vs-community.md)
 
 ---
 
@@ -73,26 +73,26 @@ mcp-soc-playbook/
 
 | # | Use Case | Tools Involved |
 |---|----------|---------------|
-| 01 | [IOC Enrichment](usecases/01-ioc-enrichment/) | VirusTotal + AbuseIPDB + MalwareBazaar |
-| 02 | [Malware Triage](usecases/02-malware-triage/) | REMnux + VirusTotal |
-| 03 | [Threat Hunting via SIEM](usecases/03-threat-hunting-siem/) | IBM QRadar / Wazuh |
-| 04 | [Incident Case Creation](usecases/04-incident-case-creation/) | TheHive + Cortex |
-| 05 | [OSINT Recon](usecases/05-osint-recon/) | Shodan + Subfinder + Nmap |
-| 06 | [Detection Engineering](usecases/06-detection-engineering/) | Sigma + Wazuh |
-| 07 | [Lateral Movement Detection](usecases/07-lateral-movement-detection/) | BloodHound + Wazuh |
-| 08 | [Phishing Analysis](usecases/08-phishing-analysis/) | URLhaus + VirusTotal + TheHive |
+| 01 | [IOC Enrichment](Usecases/01-ioc-enrichment/) | VirusTotal + AbuseIPDB + MalwareBazaar |
+| 02 | [Malware Triage](Usecases/02-malware-triage/) | REMnux + VirusTotal |
+| 03 | [Threat Hunting via SIEM](Usecases/03-threat-hunting-siem/) | IBM QRadar / Wazuh |
+| 04 | [Incident Case Creation](Usecases/04-incident-case-creation/) | TheHive + Cortex |
+| 05 | [OSINT Recon](Usecases/05-osint-recon/) | Shodan + Subfinder + Nmap |
+| 06 | [Detection Engineering](Usecases/06-detection-engineering/) | Sigma + Wazuh |
+| 07 | [Lateral Movement Detection](Usecases/07-lateral-movement-detection/) | BloodHound + Wazuh |
+| 08 | [Phishing Analysis](Usecases/08-phishing-analysis/) | URLhaus + VirusTotal + TheHive |
 
 ---
 
 ## 🔐 Security Notes
 
-This repo includes a dedicated `security-notes/` section — because connecting AI to your SOC tools creates **new attack surfaces** that need to be understood.
+This repo includes a dedicated `Security Notes/` section — because connecting AI to your SOC tools creates **new attack surfaces** that need to be understood.
 
-- [Attack Surface per Client](security-notes/attack-surface-per-client.md)
-- [Official vs Community: Why It Matters](security-notes/official-vs-community.md)
-- [Secrets Management](security-notes/secrets-management.md)
-- [Least Privilege Guide](security-notes/least-privilege-guide.md)
-- [MCP Threat Landscape](security-notes/mcp-threat-landscape.md)
+- [Attack Surface per Client](Security%20Notes/attack-surface-per-client.md)
+- [Official vs Community: Why It Matters](Security%20Notes/official-vs-community.md)
+- [Secrets Management](Security%20Notes/secrets-management.md)
+- [Least Privilege Guide](Security%20Notes/least-privilege-guide.md)
+- [MCP Threat Landscape](Security%20Notes/mcp-threat-landscape.md)
 
 ---
 
@@ -100,9 +100,9 @@ This repo includes a dedicated `security-notes/` section — because connecting 
 
 Want to reproduce the use cases locally?
 
-- [Docker Compose — Full SOC Stack](lab-setup/docker-compose.yml)
-- [WSL Setup Guide](lab-setup/wsl-setup.md)
-- [Minimal Lab (VirusTotal + TheHive + Wazuh)](lab-setup/minimal-lab.md)
+- [Docker Compose — Full SOC Stack](Labs/docker-compose.yml)
+- [WSL Setup Guide](Labs/wsl-setup.md)
+- [Minimal Lab (VirusTotal + TheHive + Wazuh)](Labs/minimal-lab.md)
 
 ---
 

@@ -26,30 +26,30 @@
     const MEDIUM = "https://medium.com/@nurjayasasongko";
 
     const hosts = [
-      { name: "Claude Desktop", icon: "🖥️", badge: "Paling mudah", file: `${REPO}/hosts/claude-desktop.md`, note: "Tidak perlu CLI, ada GUI" },
-      { name: "Claude Code", icon: "⌨️", badge: "Best security", file: `${REPO}/hosts/claude-code.md`, note: "Scope isolation dengan -s local" },
-      { name: "VS Code", icon: "💻", badge: "Familiar", file: `${REPO}/hosts/vscode.md`, note: "Lewat ekstensi Copilot/Continue" },
-      { name: "Cursor", icon: "🎯", badge: "GUI terbaik", file: `${REPO}/hosts/cursor.md`, note: "Settings UI built-in untuk MCP" },
-      { name: "Windsurf", icon: "🌊", badge: "Dari Codeium", file: `${REPO}/hosts/windsurf.md`, note: "Mirip Cursor, global config" },
+      { name: "Claude Desktop", icon: "🖥️", badge: "Paling mudah", file: `${REPO}/MCP%20Host/claude-desktop.md`, note: "Tidak perlu CLI, ada GUI" },
+      { name: "Claude Code", icon: "⌨️", badge: "Best security", file: `${REPO}/MCP%20Host/claude-code.md`, note: "Scope isolation dengan -s local" },
+      { name: "VS Code", icon: "💻", badge: "Familiar", file: `${REPO}/MCP%20Host/vscode.md`, note: "Lewat ekstensi Copilot/Continue" },
+      { name: "Cursor", icon: "🎯", badge: "GUI terbaik", file: `${REPO}/MCP%20Host/cursor.md`, note: "Settings UI built-in untuk MCP" },
+      { name: "Windsurf", icon: "🌊", badge: "Dari Codeium", file: `${REPO}/MCP%20Host/windsurf.md`, note: "Mirip Cursor, global config" },
     ];
 
     const usecases = [
-      { id: "01", title: "IOC Enrichment", level: "beginner", tools: ["VirusTotal", "AbuseIPDB", "MalwareBazaar"], req: "API key gratis saja", link: `${REPO}/usecases/01-ioc-enrichment/README.md`, desc: "Alert masuk → enrichment IOC otomatis → summary actionable" },
-      { id: "02", title: "Malware Triage", level: "beginner", tools: ["REMnux", "VirusTotal"], req: "Docker", link: `${REPO}/usecases/02-malware-triage/README.md`, desc: "File mencurigakan → identify → strings → IOC → verdict" },
-      { id: "03", title: "Threat Hunting via SIEM", level: "intermediate", tools: ["Wazuh", "VirusTotal"], req: "Wazuh instance", link: `${REPO}/usecases/03-threat-hunting-siem/README.md`, desc: "Hipotesis → query SIEM → analisis pola → hunting report" },
-      { id: "04", title: "Incident Case Creation", level: "intermediate", tools: ["TheHive", "VirusTotal", "AbuseIPDB"], req: "TheHive instance", link: `${REPO}/usecases/04-incident-case-creation/README.md`, desc: "Alert tervalidasi → enrichment → buat case → assign observables" },
-      { id: "05", title: "OSINT Recon", level: "intermediate", tools: ["Shodan", "VirusTotal", "AbuseIPDB"], req: "Shodan API key", link: `${REPO}/usecases/05-osint-recon/README.md`, desc: "Domain/IP target → passive recon → infrastructure map" },
-      { id: "06", title: "Detection Engineering", level: "advanced", tools: ["VirusTotal", "Wazuh"], req: "Wazuh + VT API", link: `${REPO}/usecases/06-detection-engineering/README.md`, desc: "IOC/TTP baru → research → draft rule → validate → document" },
-      { id: "07", title: "Lateral Movement Detection", level: "advanced", tools: ["Wazuh", "AbuseIPDB"], req: "Wazuh + Windows agents", link: `${REPO}/usecases/07-lateral-movement-detection/README.md`, desc: "Anomali login → correlate events → timeline → assessment" },
-      { id: "08", title: "Phishing Analysis", level: "intermediate", tools: ["VirusTotal", "AbuseIPDB", "REMnux"], req: "Docker + API keys", link: `${REPO}/usecases/08-phishing-analysis/README.md`, desc: "Email mencurigakan → artifact extract → analisis → verdict" },
+      { id: "01", title: "IOC Enrichment", level: "beginner", tools: ["VirusTotal", "AbuseIPDB", "MalwareBazaar"], req: "API key gratis saja", link: `${REPO}/Usecases/01-ioc-enrichment/README.md`, desc: "Alert masuk → enrichment IOC otomatis → summary actionable" },
+      { id: "02", title: "Malware Triage", level: "beginner", tools: ["REMnux", "VirusTotal"], req: "Docker", link: `${REPO}/Usecases/02-malware-triage/README.md`, desc: "File mencurigakan → identify → strings → IOC → verdict" },
+      { id: "03", title: "Threat Hunting via SIEM", level: "intermediate", tools: ["Wazuh", "VirusTotal"], req: "Wazuh instance", link: `${REPO}/Usecases/03-threat-hunting-siem/README.md`, desc: "Hipotesis → query SIEM → analisis pola → hunting report" },
+      { id: "04", title: "Incident Case Creation", level: "intermediate", tools: ["TheHive", "VirusTotal", "AbuseIPDB"], req: "TheHive instance", link: `${REPO}/Usecases/04-incident-case-creation/README.md`, desc: "Alert tervalidasi → enrichment → buat case → assign observables" },
+      { id: "05", title: "OSINT Recon", level: "intermediate", tools: ["Shodan", "VirusTotal", "AbuseIPDB"], req: "Shodan API key", link: `${REPO}/Usecases/05-osint-recon/README.md`, desc: "Domain/IP target → passive recon → infrastructure map" },
+      { id: "06", title: "Detection Engineering", level: "advanced", tools: ["VirusTotal", "Wazuh"], req: "Wazuh + VT API", link: `${REPO}/Usecases/06-detection-engineering/README.md`, desc: "IOC/TTP baru → research → draft rule → validate → document" },
+      { id: "07", title: "Lateral Movement Detection", level: "advanced", tools: ["Wazuh", "AbuseIPDB"], req: "Wazuh + Windows agents", link: `${REPO}/Usecases/07-lateral-movement-detection/README.md`, desc: "Anomali login → correlate events → timeline → assessment" },
+      { id: "08", title: "Phishing Analysis", level: "intermediate", tools: ["VirusTotal", "AbuseIPDB", "REMnux"], req: "Docker + API keys", link: `${REPO}/Usecases/08-phishing-analysis/README.md`, desc: "Email mencurigakan → artifact extract → analisis → verdict" },
     ];
 
     const securityNotes = [
-      { title: "Attack Surface per Host", file: `${REPO}/security-notes/attack-surface-per-client.md`, desc: "Risiko spesifik per aplikasi host" },
-      { title: "Official vs Community Server", file: `${REPO}/security-notes/official-vs-community.md`, desc: "Cara evaluasi server sebelum dipakai" },
-      { title: "Secrets Management", file: `${REPO}/security-notes/secrets-management.md`, desc: "Handle API key dengan benar" },
-      { title: "Least Privilege Guide", file: `${REPO}/security-notes/least-privilege-guide.md`, desc: "Prinsip akses minimal per server" },
-      { title: "MCP Threat Landscape", file: `${REPO}/security-notes/mcp-threat-landscape.md`, desc: "Attack vectors dari riset terbaru" },
+      { title: "Attack Surface per Host", file: `${REPO}/Security%20Notes/attack-surface-per-client.md`, desc: "Risiko spesifik per aplikasi host" },
+      { title: "Official vs Community Server", file: `${REPO}/Security%20Notes/official-vs-community.md`, desc: "Cara evaluasi server sebelum dipakai" },
+      { title: "Secrets Management", file: `${REPO}/Security%20Notes/secrets-management.md`, desc: "Handle API key dengan benar" },
+      { title: "Least Privilege Guide", file: `${REPO}/Security%20Notes/least-privilege-guide.md`, desc: "Prinsip akses minimal per server" },
+      { title: "MCP Threat Landscape", file: `${REPO}/Security%20Notes/mcp-threat-landscape.md`, desc: "Attack vectors dari riset terbaru" },
     ];
 
     const articles = [
@@ -195,7 +195,7 @@
                       ))}
                     </div>
                   </div>
-                  <a href={`${REPO}/usecases/01-ioc-enrichment/README.md`} target="_blank" rel="noopener noreferrer"
+                  <a href={`${REPO}/Usecases/01-ioc-enrichment/README.md`} target="_blank" rel="noopener noreferrer"
                     style={{ display: "inline-block", padding: "10px 20px", background: "#6366f1", color: "#fff", textDecoration: "none", borderRadius: 6, fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>
                     → Buka Use Case 01
                   </a>

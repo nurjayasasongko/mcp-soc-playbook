@@ -103,4 +103,4 @@ echo ".cursor/mcp.json" >> .gitignore
 "args": ["mcp-virustotal==0.2.1"]
 ```
 
-> Full analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)
+> Full analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)

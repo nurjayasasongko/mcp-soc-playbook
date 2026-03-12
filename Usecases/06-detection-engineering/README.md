@@ -76,4 +76,4 @@ Bantu saya buat detection rule untuk Wazuh:
 - **Rule testing di lab dulu:** Jangan deploy rule langsung ke production — test di Wazuh lab instance untuk validate false positive rate
 - **Sample hash sensitivity:** Hash yang dikirim ke VT akan ter-log. Kalau sample dari engagement yang sedang berjalan, koordinasikan disclosure dulu
 
-> Least privilege guide → [../../security-notes/least-privilege-guide.md](../../security-notes/least-privilege-guide.md)
+> Least privilege guide → [../../Security Notes/least-privilege-guide.md](../../Security%20Notes/least-privilege-guide.md)

@@ -86,4 +86,4 @@ Lakukan passive recon:
 - **Rate limiting Shodan:** Free tier Shodan sangat terbatas. Kalau banyak IP yang perlu dicek, pertimbangkan batching manual
 - **Legal boundary:** OSINT passive recon umumnya aman secara legal — tapi pastikan scope engagement jelas sebelum mulai kalau ini untuk engagement formal
 
-> Security notes lengkap → [../../security-notes/official-vs-community.md](../../security-notes/official-vs-community.md)
+> Security notes lengkap → [../../Security Notes/official-vs-community.md](../../Security%20Notes/official-vs-community.md)

@@ -28,7 +28,7 @@ Each use case follows the same structure:
 ## How to Use
 
 1. Pick a use case relevant to your workflow
-2. Follow the lab setup in [../lab-setup/](../lab-setup/)
+2. Follow the lab setup in [../Labs/](../Labs/)
 3. Copy the config from `config/` to your MCP client
 4. Use the provided prompt as a starting point
 5. Adapt to your real environment
@@ -38,7 +38,7 @@ Each use case follows the same structure:
 ## Contribute a Use Case
 
 Have a SOC workflow that works well with MCP? Open a PR with:
-- New folder under `usecases/`
+- New folder under `Usecases/`
 - `README.md` following the existing structure
 - Config files for at least one MCP client
 - Security notes specific to the workflow

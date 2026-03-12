@@ -126,4 +126,4 @@ export WAZUH_API_URL="https://localhost:55000"
 code .
 ```
 
-> Full analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)
+> Full analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)

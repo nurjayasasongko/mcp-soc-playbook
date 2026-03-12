@@ -106,4 +106,4 @@ Analisis:
 - **URL unshortening:** Unshorten URL sebelum submit ke VT — jangan klik langsung. Pakai tool seperti `unshorten.me` atau cek redirect chain manual
 - **User notification:** Draft notifikasi ke user harus jelas tapi tidak menimbulkan panik — tone yang tepat penting untuk user compliance
 
-> Security notes lengkap → [../../security-notes/mcp-threat-landscape.md](../../security-notes/mcp-threat-landscape.md)
+> Security notes lengkap → [../../Security Notes/mcp-threat-landscape.md](../../Security%20Notes/mcp-threat-landscape.md)

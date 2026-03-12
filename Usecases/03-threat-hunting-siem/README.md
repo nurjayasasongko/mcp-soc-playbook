@@ -92,4 +92,4 @@ Langkah yang saya minta:
 - **Query scope:** Batasi time range query — query tanpa batas waktu di SIEM besar bisa berdampak ke performa
 - **Data sensitivity:** Hasil query SIEM mungkin mengandung data sensitif — perhatikan kalau model dipakai via cloud API
 
-> Security notes lengkap → [../../security-notes/secrets-management.md](../../security-notes/secrets-management.md)
+> Security notes lengkap → [../../Security Notes/secrets-management.md](../../Security%20Notes/secrets-management.md)

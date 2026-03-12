@@ -109,4 +109,4 @@ LLM akan secara otomatis:
 - **Data leakage:** Hash dan IP yang dikirim ke VirusTotal/AbuseIPDB akan ter-log di server mereka — jangan submit IOC dari investigasi yang sifatnya confidential sebelum disclosure
 - **Community server trust:** Server VirusTotal dan AbuseIPDB ini bukan official vendor — review source code sebelum pakai di environment production
 
-> Untuk threat model lengkap → [../../security-notes/official-vs-community.md](../../security-notes/official-vs-community.md)
+> Untuk threat model lengkap → [../../Security Notes/official-vs-community.md](../../Security%20Notes/official-vs-community.md)

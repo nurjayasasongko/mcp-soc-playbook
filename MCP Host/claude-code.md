@@ -119,4 +119,4 @@ claude mcp list -s user
 
 Server di user scope sering lupa di-remove setelah project selesai. Review berkala mencegah akses yang tidak perlu tetap aktif.
 
-> Full analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)
+> Full analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)

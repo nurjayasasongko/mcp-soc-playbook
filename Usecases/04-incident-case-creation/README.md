@@ -91,4 +91,4 @@ Lakukan:
 - **API key scope:** Gunakan API key TheHive dengan permission minimal yang dibutuhkan — bukan admin key
 - **Observable sensitivity:** Username dan hostname internal yang masuk ke case bersifat sensitif — pastikan TheHive instance-nya di-access control dengan benar
 
-> Least privilege guide → [../../security-notes/least-privilege-guide.md](../../security-notes/least-privilege-guide.md)
+> Least privilege guide → [../../Security Notes/least-privilege-guide.md](../../Security%20Notes/least-privilege-guide.md)

@@ -36,4 +36,4 @@ Perbandingan config MCP per host. "Host" di sini merujuk ke aplikasi tempat mode
 | Cursor | Tool shadowing (InvariantLabs demo) | Review tool descriptions before approving |
 | Windsurf | Global config, no scope isolation | Limit servers to what's actively needed |
 
-> Full analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)
+> Full analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)
