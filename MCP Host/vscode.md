@@ -1,29 +1,28 @@
 # VS Code — MCP Config Reference
 
-VS Code support MCP lewat ekstensi AI — GitHub Copilot (agent mode) atau Continue. Ada dua level config: workspace dan global. Pilihan level ini punya implikasi security yang berbeda.
+> 📖 Official docs: [code.visualstudio.com — Add and manage MCP servers](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
+> 📖 Config reference: [code.visualstudio.com — MCP configuration reference](https://code.visualstudio.com/docs/copilot/reference/mcp-configuration)
+
+VS Code support MCP via GitHub Copilot agent mode (built-in) atau ekstensi Continue. Ada dua level config: workspace (per project) dan user profile (global). Keunggulan VS Code: syntax `${input:}` untuk menyimpan secrets secara aman tanpa menulis ke file config.
 
 ## Config File Location
 
 | Level | Path | Scope |
 |-------|------|-------|
 | Workspace | `.vscode/mcp.json` | Hanya project ini |
-| Global | `settings.json` via UI | Semua project |
-
-**Prefer workspace config** untuk server yang spesifik ke satu project. Tapi perhatikan: workspace config bisa ter-commit ke repo kalau tidak dijaga.
+| User profile | Via command `MCP: Open User Configuration` | Semua project |
 
 ## Base Structure
 
 ```json
 {
-  "mcp": {
-    "servers": {
-      "<nama-server>": {
-        "type": "stdio",
-        "command": "<executable>",
-        "args": ["<arg1>"],
-        "env": {
-          "API_KEY": "${env:API_KEY}"
-        }
+  "servers": {
+    "<nama-server>": {
+      "type": "stdio",
+      "command": "<executable>",
+      "args": ["<arg1>"],
+      "env": {
+        "API_KEY": "${env:API_KEY}"
       }
     }
   }
@@ -39,10 +38,47 @@ VS Code support MCP lewat ekstensi AI — GitHub Copilot (agent mode) atau Conti
 | `args` | array | ❌ | Arguments ke command |
 | `env` | object | ❌ | Environment variables |
 | `url` | string | ✅ (http) | URL remote server |
+| `inputs` | array | ❌ | Input variable definitions untuk secrets |
 
-## Env Var Syntax
+## Transport Types
 
-VS Code pakai syntax khusus untuk referensikan env var dari OS:
+### stdio — Local Process
+
+```json
+{
+  "servers": {
+    "virustotal": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-virustotal==0.2.1"],
+      "env": {
+        "VT_API_KEY": "${env:VT_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+### Streamable HTTP — Remote Server
+
+VS Code mencoba Streamable HTTP dulu, fallback ke SSE kalau tidak didukung server.
+
+```json
+{
+  "servers": {
+    "qradar": {
+      "type": "http",
+      "url": "http://your-qradar-mcp-server:8080/mcp"
+    }
+  }
+}
+```
+
+## Input Variables untuk Secrets
+
+VS Code punya dua cara referensikan secrets tanpa hardcode:
+
+**`${env:NAMA_VAR}`** — pull dari environment OS secara langsung:
 
 ```json
 "env": {
@@ -50,46 +86,62 @@ VS Code pakai syntax khusus untuk referensikan env var dari OS:
 }
 ```
 
-Ini yang membedakan VS Code dari host lain — `${env:NAMA_VAR}` langsung pull dari environment OS. API key tidak perlu ditulis di config file.
-
-## Real Example: Threat Hunting dengan Wazuh
+**`${input:variable-id}`** — VS Code prompt sekali, simpan secara terenkripsi:
 
 ```json
 {
-  "mcp": {
-    "servers": {
-      "wazuh": {
-        "type": "stdio",
-        "command": "python",
-        "args": ["-m", "wazuh_mcp_server"],
-        "env": {
-          "WAZUH_API_URL": "${env:WAZUH_API_URL}",
-          "WAZUH_USER": "${env:WAZUH_USER}",
-          "WAZUH_PASSWORD": "${env:WAZUH_PASSWORD}"
-        }
-      },
-      "virustotal": {
-        "type": "stdio",
-        "command": "uvx",
-        "args": ["mcp-virustotal==0.2.1"],
-        "env": {
-          "VT_API_KEY": "${env:VT_API_KEY}"
-        }
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "vt-key",
+      "description": "VirusTotal API Key",
+      "password": true
+    }
+  ],
+  "servers": {
+    "virustotal": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-virustotal==0.2.1"],
+      "env": {
+        "VT_API_KEY": "${input:vt-key}"
       }
     }
   }
 }
 ```
 
-## Real Example: Remote MCP Server via HTTP
+Dengan `${input:}`, VS Code akan minta API key sekali saat server pertama kali start, lalu menyimpannya secara encrypted — tidak perlu set env var di OS.
+
+## Real Example: Threat Hunting dengan Wazuh
 
 ```json
 {
-  "mcp": {
-    "servers": {
-      "qradar": {
-        "type": "http",
-        "url": "http://your-qradar-mcp-server:8080/mcp"
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "wazuh-password",
+      "description": "Wazuh API Password",
+      "password": true
+    }
+  ],
+  "servers": {
+    "wazuh": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "wazuh_mcp_server"],
+      "env": {
+        "WAZUH_API_URL": "${env:WAZUH_API_URL}",
+        "WAZUH_USER": "${env:WAZUH_USER}",
+        "WAZUH_PASSWORD": "${input:wazuh-password}"
+      }
+    },
+    "virustotal": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-virustotal==0.2.1"],
+      "env": {
+        "VT_API_KEY": "${env:VT_API_KEY}"
       }
     }
   }
@@ -98,32 +150,29 @@ Ini yang membedakan VS Code dari host lain — `${env:NAMA_VAR}` langsung pull d
 
 ## ⚠️ Security Considerations
 
-**Risiko terbesar: commit ke repo**
+**Risiko utama: workspace config ter-commit ke repo**
 
-`.vscode/mcp.json` di workspace sangat mudah ikut ter-commit — terutama kalau tim belum set `.gitignore` dengan benar.
+`.vscode/mcp.json` sangat mudah ikut ter-commit, terutama jika belum ada `.gitignore` yang benar.
 
 ```bash
-# Tambahkan ini ke .gitignore sebelum apapun
 echo ".vscode/mcp.json" >> .gitignore
 ```
 
-**Gunakan `${env:}` syntax, jangan hardcode**
+**Gunakan `${env:}` atau `${input:}`, bukan hardcode**
 
 ```json
 // ❌ Jangan
 "env": { "API_KEY": "vt-abc123-real-key" }
 
-// ✅ Ini
+// ✅ Env var dari OS
 "env": { "VT_API_KEY": "${env:VT_API_KEY}" }
+
+// ✅ Atau input yang disimpan terenkripsi
+"env": { "VT_API_KEY": "${input:vt-key}" }
 ```
 
-**Set env var di OS sebelum buka VS Code**
+**Trust prompt — jangan skip**
 
-```bash
-# WSL / Linux / macOS
-export VT_API_KEY="your-key-here"
-export WAZUH_API_URL="https://localhost:55000"
-code .
-```
+VS Code akan minta konfirmasi trust saat pertama kali start server baru. Baca config server-nya dulu sebelum approve.
 
-> Full analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)
+> Full security analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)

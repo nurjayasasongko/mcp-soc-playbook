@@ -1,14 +1,16 @@
 # Windsurf — MCP Config Reference
 
-Windsurf dari Codeium adalah code editor dengan built-in AI (Cascade) yang support MCP. Setup-nya mirip Cursor — ada GUI dan config file JSON. Tidak ada scope isolation, semua server bersifat global.
+> 📖 Official docs: [docs.windsurf.com — Cascade MCP Integration](https://docs.windsurf.com/windsurf/cascade/mcp)
+
+Windsurf dari Codeium adalah code editor dengan built-in AI bernama Cascade yang support MCP. Setup mirip Cursor — ada plugin store dan config JSON. Tidak ada scope isolation; semua server bersifat global. Satu hal yang membedakan Windsurf: mendukung env var interpolation langsung di config file.
 
 ## Config File Location
 
 | OS | Path |
 |----|------|
-| Windows | `%APPDATA%\Codeium\windsurf\mcp_config.json` |
-| macOS | `~/.codeium/windsurf/mcp_config.json` |
-| Linux | `~/.codeium/windsurf/mcp_config.json` |
+| Windows | `%USERPROFILE%\.codeium\mcp_config.json` |
+| macOS | `~/.codeium/mcp_config.json` |
+| Linux | `~/.codeium/mcp_config.json` |
 
 ## Base Structure
 
@@ -19,22 +21,67 @@ Windsurf dari Codeium adalah code editor dengan built-in AI (Cascade) yang suppo
       "command": "<executable>",
       "args": ["<arg1>"],
       "env": {
-        "API_KEY": "value"
+        "API_KEY": "$API_KEY"
       }
     }
   }
 }
 ```
 
+**Catatan:** Windsurf mendukung interpolasi env var dengan format `$NAMA_VAR` di field `command`, `args`, `env`, dan `serverUrl`. Ini memungkinkan API key disimpan di environment OS, bukan di config file.
+
 ## Supported Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `command` | string | ✅ | Executable yang dijalankan |
+| `command` | string | ✅ (stdio) | Executable yang dijalankan |
 | `args` | array | ❌ | Arguments ke command |
 | `env` | object | ❌ | Environment variables |
-| `type` | string | ❌ | `stdio` (default) atau `http` |
-| `url` | string | ❌ | Required jika `type: "http"` |
+| `serverUrl` | string | ✅ (http) | URL remote server (HTTP transport) |
+| `headers` | object | ❌ | HTTP headers, misalnya untuk auth token |
+
+## Transport Types
+
+### stdio — Local Process
+
+```json
+{
+  "mcpServers": {
+    "virustotal": {
+      "command": "uvx",
+      "args": ["mcp-virustotal==0.2.1"],
+      "env": {
+        "VT_API_KEY": "$VT_API_KEY"
+      }
+    }
+  }
+}
+```
+
+### HTTP — Remote Server
+
+Windsurf menggunakan field `serverUrl` (bukan `url`) untuk transport HTTP.
+
+```json
+{
+  "mcpServers": {
+    "qradar": {
+      "serverUrl": "http://your-qradar-mcp-server:8080/mcp",
+      "headers": {
+        "Authorization": "Bearer your-token"
+      }
+    }
+  }
+}
+```
+
+## Setup via GUI
+
+Windsurf punya MCP Plugin Store untuk onboarding yang lebih mudah:
+
+`Settings → Tools → Windsurf Settings → Add Server`
+
+Untuk server yang tidak ada di store, klik **View Raw Config** dan edit `mcp_config.json` langsung.
 
 ## Real Example: Malware Analysis
 
@@ -54,7 +101,7 @@ Windsurf dari Codeium adalah code editor dengan built-in AI (Cascade) yang suppo
       "command": "uvx",
       "args": ["mcp-virustotal==0.2.1"],
       "env": {
-        "VT_API_KEY": "your_vt_key"
+        "VT_API_KEY": "$VT_API_KEY"
       }
     }
   }
@@ -65,32 +112,38 @@ Windsurf dari Codeium adalah code editor dengan built-in AI (Cascade) yang suppo
 
 **Tidak ada scope isolation**
 
-Semua server yang dikonfigurasi aktif secara global di semua sesi Windsurf. Tidak ada equivalent dari Claude Code's `-s local`.
+Semua server aktif secara global di semua sesi Windsurf. Tidak ada equivalen dari Claude Code's `-s local`. Mitigasi: hanya tambahkan server yang aktif dipakai, remove segera setelah tidak dibutuhkan.
 
-Mitigasi: hanya tambahkan server yang memang aktif dipakai. Remove server yang sudah tidak dibutuhkan — jangan biarkan menumpuk.
+**Workaround untuk per-project isolation**
 
-**Config file global, bukan per project**
-
-Berbeda dari VS Code yang punya workspace config, Windsurf hanya punya satu config file global. Ini berarti tidak ada cara native untuk isolasi server per project.
-
-Workaround: buat beberapa profil manual dengan rename config file sesuai kebutuhan:
+Karena tidak ada native scope isolation, bisa buat beberapa profil config manual:
 
 ```bash
-# Simpan config untuk project threat hunting
-cp ~/.codeium/windsurf/mcp_config.json ~/.codeium/windsurf/mcp_config.threat-hunting.json
+# Simpan config aktif sebelum switch project
+cp ~/.codeium/mcp_config.json ~/.codeium/mcp_config.backup.json
 
-# Switch ke config minimal saat tidak sedang hunting
-cp ~/.codeium/windsurf/mcp_config.minimal.json ~/.codeium/windsurf/mcp_config.json
+# Pakai config minimal saat tidak sedang investigation
+cp ~/.codeium/mcp_config.minimal.json ~/.codeium/mcp_config.json
 ```
 
-**Version pinning tetap berlaku**
+**Gunakan env var interpolation, bukan hardcode**
 
 ```json
-// Jangan
+// ❌ Jangan
+"env": { "VT_API_KEY": "vt-abc123-real-key" }
+
+// ✅ Interpolasi dari OS env
+"env": { "VT_API_KEY": "$VT_API_KEY" }
+```
+
+**Version pinning**
+
+```json
+// ❌ Tanpa pinning
 "args": ["mcp-virustotal"]
 
-// Pin versi
+// ✅ Pin ke versi spesifik
 "args": ["mcp-virustotal==0.2.1"]
 ```
 
-> Full analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)
+> Full security analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)

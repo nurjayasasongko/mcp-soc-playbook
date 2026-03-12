@@ -1,5 +1,9 @@
 # Claude Desktop — MCP Config Reference
 
+> 📖 Official docs: [docs.anthropic.com — MCP Overview](https://docs.anthropic.com/en/docs/agents-and-tools/mcp)
+
+Claude Desktop adalah aplikasi desktop dari Anthropic yang paling umum dipakai untuk explorasi MCP. Config MCP dilakukan via file JSON — tidak ada CLI, tidak ada scope isolation. Semua server yang dikonfigurasi aktif secara global di semua sesi.
+
 ## Config File Location
 
 | OS | Path |
@@ -13,7 +17,7 @@
 ```json
 {
   "mcpServers": {
-    "<server-name>": {
+    "<nama-server>": {
       "command": "<executable>",
       "args": ["<arg1>", "<arg2>"],
       "env": {
@@ -28,15 +32,18 @@
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `command` | string | ✅ | Executable to run (e.g. `python`, `npx`, `uvx`) |
-| `args` | array | ✅ | Arguments passed to the command |
-| `env` | object | ❌ | Environment variables injected at runtime |
-| `type` | string | ❌ | Transport type: `stdio` (default) or `http` |
-| `url` | string | ❌ | Required if `type: "http"` — remote server URL |
+| `command` | string | ✅ | Executable yang dijalankan (`python`, `npx`, `uvx`, `docker`) |
+| `args` | array | ✅ | Arguments ke command |
+| `env` | object | ❌ | Environment variables yang di-inject saat runtime |
+| `type` | string | ❌ | Transport: `stdio` (default) atau `http` |
+| `url` | string | ❌ | Wajib jika `type: "http"` — URL remote server |
 
 ## Transport Types
 
-### stdio (Local Process)
+### stdio — Local Process
+
+Untuk server yang berjalan di mesin yang sama. Paling umum untuk lab dan dev environment.
+
 ```json
 {
   "mcpServers": {
@@ -53,7 +60,10 @@
 }
 ```
 
-### Streamable HTTP (Remote Server)
+### Streamable HTTP — Remote Server
+
+Untuk server yang berjalan di mesin terpisah atau di network.
+
 ```json
 {
   "mcpServers": {
@@ -65,68 +75,70 @@
 }
 ```
 
-## Real Example: VirusTotal MCP
+> **Catatan:** SSE (Server-Sent Events) adalah transport lama yang sudah deprecated. Gunakan Streamable HTTP untuk setup remote baru.
+
+## Scope
+
+Claude Desktop **tidak mendukung scope isolation**. Semua server di config ini aktif di seluruh sesi dan conversation — tidak ada pembeda per project.
+
+Implikasi: server SIEM dengan write access yang dikonfigurasi di Claude Desktop akan aktif bahkan saat kamu tidak sedang melakukan investigasi. Remove server yang tidak aktif dipakai.
+
+## Real Example: IOC Enrichment
 
 ```json
 {
   "mcpServers": {
     "virustotal": {
       "command": "uvx",
-      "args": ["mcp-virustotal"],
+      "args": ["mcp-virustotal==0.2.1"],
       "env": {
-        "VT_API_KEY": "your_virustotal_api_key_here"
+        "VT_API_KEY": "your_virustotal_api_key"
+      }
+    },
+    "abuseipdb": {
+      "command": "uvx",
+      "args": ["mcp-abuseipdb"],
+      "env": {
+        "ABUSEIPDB_API_KEY": "your_abuseipdb_key"
       }
     }
   }
 }
 ```
 
-## Real Example: REMnux MCP (via Docker)
-
-```json
-{
-  "mcpServers": {
-    "remnux": {
-      "command": "docker",
-      "args": [
-        "run", "--rm", "-i",
-        "-v", "/samples:/samples",
-        "remnux/mcp-server"
-      ]
-    }
-  }
-}
-```
-
-## Scope
-
-Claude Desktop **does not support scope isolation** (no local vs user distinction). All servers configured here are globally available to all conversations.
-
-> ⚠️ **Security Note:** Because Claude Desktop has no scope isolation, avoid connecting high-privilege servers (e.g., SIEM write access) unless actively needed. Remove servers when not in use.
-
 ## ⚠️ Security Considerations
 
-**Config file permissions**
-The config file is readable by any process running under the same user account. On shared machines, this means API keys stored in `env` are accessible to other user-level processes.
+**Config file readable oleh semua proses user-level**
+
+File config bisa dibaca oleh proses apapun yang berjalan di bawah user yang sama. Di shared machine, ini berarti API key yang disimpan di `env` bisa diakses proses lain.
 
 ```bash
-# Windows — check who can read the config
-icacls "%APPDATA%\Claude\claude_desktop_config.json"
-
-# macOS/Linux — lock down permissions
+# macOS/Linux — restrict file permissions
 chmod 600 ~/Library/Application\ Support/Claude/claude_desktop_config.json
+
+# Windows — check permissions
+icacls "%APPDATA%\Claude\claude_desktop_config.json"
 ```
 
-**Never hardcode secrets directly**
-Prefer referencing environment variables from the system rather than embedding raw values:
+**Jangan hardcode API key**
 
 ```json
-// ❌ Don't do this
-"env": { "API_KEY": "vt-abc123-hardcoded" }
+// ❌ Jangan
+"env": { "VT_API_KEY": "vt-abc123-hardcoded" }
 
-// ✅ Do this — set the env var at OS level, reference here
+// ✅ Set env var di OS, referensikan di sini
 "env": { "VT_API_KEY": "${VT_API_KEY}" }
 ```
 
-> Full security analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)
-> Secrets management guide → [../Security Notes/secrets-management.md](../Security%20Notes/secrets-management.md)
+**Version pinning untuk community server**
+
+```json
+// ❌ Tanpa pinning — versi bisa berubah kapan saja
+"args": ["mcp-virustotal"]
+
+// ✅ Pin ke versi spesifik
+"args": ["mcp-virustotal==0.2.1"]
+```
+
+> Full security analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)
+> Secrets management guide → [../security-notes/secrets-management.md](../security-notes/secrets-management.md)

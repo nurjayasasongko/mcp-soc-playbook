@@ -1,80 +1,89 @@
 # Claude Code — MCP Config Reference
 
-Claude Code adalah CLI tool dari Anthropic. Berbeda dari Claude Desktop, semua config MCP dilakukan lewat command line — tidak ada GUI. Keunggulan utamanya dari sisi security: **scope isolation**.
+> 📖 Official docs: [docs.anthropic.com — Claude Code MCP](https://docs.anthropic.com/en/docs/claude-code/mcp)
 
-## Add Server
-
-```bash
-# Sintaks dasar
-claude mcp add <nama-server> [flags] -- <command> [args]
-
-# Local scope — hanya aktif di project ini
-claude mcp add virustotal -s local -- uvx mcp-virustotal
-
-# User scope — aktif di semua project
-claude mcp add virustotal -s user -- uvx mcp-virustotal
-
-# Dengan environment variable
-claude mcp add virustotal -s local \
-  -e VT_API_KEY=your_key_here \
-  -- uvx mcp-virustotal
-```
-
-## Scope
-
-Ini yang paling penting di Claude Code dan tidak ada di host lain.
-
-| Scope | Flag | Config Location | Kapan Pakai |
-|-------|------|----------------|-------------|
-| Local | `-s local` | `.mcp.json` di project dir | Server spesifik satu project/lab |
-| User | `-s user` | `~/.claude/settings.json` | Server yang dipakai di semua project |
-
-**Selalu prefer `-s local`** untuk server dengan akses ke sistem sensitif. Server SIEM yang di-set sebagai user scope tersedia di semua project — termasuk yang tidak perlu akses ke sana.
+Claude Code adalah CLI tool dari Anthropic untuk agentic coding. Berbeda dari Claude Desktop, semua config MCP dilakukan via command line. Keunggulan utama dari sisi security: **scope isolation** — server bisa dibatasi hanya aktif di satu project tertentu.
 
 ## Config File Location
 
 | Scope | Path |
 |-------|------|
-| Local | `.mcp.json` di root project directory |
-| User | `~/.claude/settings.json` |
+| Local (per project) | `.mcp.json` di root project directory |
+| User (global) | `~/.claude/settings.json` |
 
-## Supported Parameters
+## Base Structure
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `-s` / `--scope` | string | ✅ | `local` atau `user` |
-| `-e` / `--env` | string | ❌ | Environment variable: `-e KEY=value` |
+Config tidak ditulis manual — dibuat via `claude mcp add`. Tapi kalau perlu edit langsung, format `.mcp.json` adalah:
+
+```json
+{
+  "mcpServers": {
+    "<nama-server>": {
+      "command": "<executable>",
+      "args": ["<arg1>"],
+      "env": {
+        "API_KEY": "value"
+      }
+    }
+  }
+}
+```
+
+## Supported Parameters (CLI Flags)
+
+| Flag | Shorthand | Required | Description |
+|------|-----------|----------|-------------|
+| `--scope` | `-s` | ✅ | `local` (project) atau `user` (global) |
+| `--env` | `-e` | ❌ | Environment variable: `-e KEY=value` |
+| `--transport` | — | ❌ | `stdio` (default) atau `http` |
 | `--` | — | ✅ | Separator antara flag dan command |
+
+## Transport Types
+
+### stdio — Local Process
+
+```bash
+claude mcp add virustotal -s local -- uvx mcp-virustotal==0.2.1
+```
+
+### Streamable HTTP — Remote Server
+
+```bash
+claude mcp add --transport http qradar http://your-qradar-mcp:8080/mcp
+```
+
+## Scope Isolation
+
+Ini yang paling penting di Claude Code dan tidak ada di host lain.
+
+| Scope | Flag | Kapan Pakai |
+|-------|------|-------------|
+| Local | `-s local` | Server spesifik satu project atau lab |
+| User | `-s user` | Server yang dipakai di semua project |
+
+**Selalu prefer `-s local`** untuk server dengan akses ke sistem sensitif. Server SIEM yang di-set sebagai user scope tersedia di semua project — termasuk yang tidak butuh akses ke sana.
 
 ## Manage Servers
 
 ```bash
-# List semua server yang terkonfigurasi
+# Tambah server (local scope)
+claude mcp add virustotal -s local \
+  -e VT_API_KEY=${VT_API_KEY} \
+  -- uvx mcp-virustotal==0.2.1
+
+# List semua server
 claude mcp list
 
-# Lihat detail satu server
+# Lihat detail server
 claude mcp get virustotal
 
-# Remove server
-claude mcp remove virustotal
-
-# Remove dari scope tertentu
+# Hapus server
 claude mcp remove virustotal -s local
 ```
-
-## Debug Mode
-
-```bash
-# Jalankan dengan MCP debug output
-claude --mcp-debug
-```
-
-Berguna untuk investigasi ad-hoc — lihat semua JSON-RPC communication secara real-time.
 
 ## Real Example: IOC Enrichment Setup
 
 ```bash
-# Setup untuk project threat hunting
 cd ~/projects/threat-hunting
 
 claude mcp add virustotal -s local \
@@ -92,7 +101,7 @@ claude mcp list
 
 **`.mcp.json` jangan di-commit ke Git**
 
-File `.mcp.json` di project directory bisa ikut ter-commit kalau tidak hati-hati.
+File `.mcp.json` di project directory bisa ikut ter-commit.
 
 ```bash
 echo ".mcp.json" >> .gitignore
@@ -100,23 +109,29 @@ echo ".mcp.json" >> .gitignore
 
 **Version pinning**
 
-Selalu pin ke versi spesifik untuk community servers:
-
 ```bash
-# Jangan
+# ❌ Tanpa pinning
 claude mcp add virustotal -s local -- uvx mcp-virustotal
 
-# Pin versi
+# ✅ Pin ke versi spesifik
 claude mcp add virustotal -s local -- uvx mcp-virustotal==0.2.1
 ```
 
-**Scope review berkala**
+**Review user scope berkala**
 
 ```bash
-# Cek semua server yang terdaftar di user scope
+# Cek server yang aktif secara global
 claude mcp list -s user
 ```
 
-Server di user scope sering lupa di-remove setelah project selesai. Review berkala mencegah akses yang tidak perlu tetap aktif.
+Server di user scope sering lupa di-remove setelah project selesai. Review mencegah akses yang tidak perlu tetap aktif.
 
-> Full analysis → [../Security Notes/attack-surface-per-client.md](../Security%20Notes/attack-surface-per-client.md)
+**Debug mode untuk investigasi**
+
+```bash
+claude --mcp-debug
+```
+
+Tampilkan semua JSON-RPC communication secara real-time — berguna untuk verify tool mana yang dipanggil dan dengan parameter apa.
+
+> Full security analysis → [../security-notes/attack-surface-per-client.md](../security-notes/attack-surface-per-client.md)
